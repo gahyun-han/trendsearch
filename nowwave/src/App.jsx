@@ -136,53 +136,83 @@ async function fetchYouTubeTrending(apiKey, category) {
 }
 
 // ── 설정 모달 ────────────────────────────────────────────────
-function SettingsModal({ onSave, onClose, current }) {
-  const [yt, setYt] = useState(current || "");
-  const [show, setShow] = useState(false);
+function SettingsModal({ onSave, onClose, currentYt, currentGemini }) {
+  const [yt, setYt]         = useState(currentYt || "");
+  const [gemini, setGemini] = useState(currentGemini || "");
+  const [showYt, setShowYt]         = useState(false);
+  const [showGemini, setShowGemini] = useState(false);
+
+  const canSave = gemini.trim(); // Gemini 키는 필수
+
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)",
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.88)",
       zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
       onClick={onClose}>
       <div onClick={e => e.stopPropagation()} style={{
         background: "#0d1117", border: "1px solid rgba(255,255,255,0.12)",
-        borderRadius: 20, padding: 28, width: "100%", maxWidth: 420,
+        borderRadius: 20, padding: 28, width: "100%", maxWidth: 440,
         boxShadow: "0 24px 60px rgba(0,0,0,0.7)",
       }}>
-        <div style={{ fontSize: 11, color: "#f87171", letterSpacing: 2,
-          fontFamily: "monospace", marginBottom: 10 }}>▶ YouTube API 설정</div>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 8 }}>
-          YouTube API 키 입력
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 6 }}>
+          API 설정
         </h2>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", lineHeight: 1.7, marginBottom: 20 }}>
-          Google Cloud Console에서 발급받은 키를 입력하세요.<br/>
-          키는 이 브라우저에만 저장되며 외부로 전송되지 않아요.
+        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 24 }}>
+          키는 이 브라우저에만 저장돼요.
         </p>
-        <div style={{ position: "relative", marginBottom: 20 }}>
-          <input type={show ? "text" : "password"} value={yt}
-            onChange={e => setYt(e.target.value)}
-            placeholder="AIza..."
-            style={{ width: "100%", background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10,
-              color: "#fff", fontSize: 13, padding: "12px 44px 12px 14px",
-              fontFamily: "monospace", outline: "none" }} />
-          <button onClick={() => setShow(!show)} style={{
-            position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
-            background: "none", border: "none", color: "rgba(255,255,255,0.35)",
-            cursor: "pointer", fontSize: 14 }}>
-            {show ? "🙈" : "👁"}
-          </button>
+
+        {/* Gemini API 키 — 필수 */}
+        <div style={{ marginBottom: 20, padding: "16px", borderRadius: 12,
+          background: "rgba(66,133,244,0.06)", border: "1px solid rgba(66,133,244,0.2)" }}>
+          <div style={{ fontSize: 11, color: "#4285f4", letterSpacing: 1, marginBottom: 10 }}>
+            ✦ Gemini API 키 (필수) — aistudio.google.com에서 무료 발급
+          </div>
+          <div style={{ position: "relative" }}>
+            <input type={showGemini ? "text" : "password"} value={gemini}
+              onChange={e => setGemini(e.target.value)}
+              placeholder="AIza..."
+              style={{ width: "100%", background: "rgba(255,255,255,0.05)",
+                border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10,
+                color: "#fff", fontSize: 13, padding: "11px 40px 11px 14px",
+                fontFamily: "monospace", outline: "none" }} />
+            <button onClick={() => setShowGemini(!showGemini)} style={{
+              position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+              background: "none", border: "none", color: "rgba(255,255,255,0.3)",
+              cursor: "pointer", fontSize: 14 }}>{showGemini ? "🙈" : "👁"}</button>
+          </div>
         </div>
+
+        {/* YouTube API 키 — 선택 */}
+        <div style={{ marginBottom: 24, padding: "16px", borderRadius: 12,
+          background: "rgba(248,113,113,0.05)", border: "1px solid rgba(248,113,113,0.15)" }}>
+          <div style={{ fontSize: 11, color: "#f87171", letterSpacing: 1, marginBottom: 10 }}>
+            ▶ YouTube API 키 (선택) — console.cloud.google.com
+          </div>
+          <div style={{ position: "relative" }}>
+            <input type={showYt ? "text" : "password"} value={yt}
+              onChange={e => setYt(e.target.value)}
+              placeholder="AIza... (없으면 YouTube 데이터 제외)"
+              style={{ width: "100%", background: "rgba(255,255,255,0.05)",
+                border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10,
+                color: "#fff", fontSize: 13, padding: "11px 40px 11px 14px",
+                fontFamily: "monospace", outline: "none" }} />
+            <button onClick={() => setShowYt(!showYt)} style={{
+              position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+              background: "none", border: "none", color: "rgba(255,255,255,0.3)",
+              cursor: "pointer", fontSize: 14 }}>{showYt ? "🙈" : "👁"}</button>
+          </div>
+        </div>
+
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={onClose} style={{ flex: 1, padding: 12, borderRadius: 10,
             border: "1px solid rgba(255,255,255,0.1)", background: "transparent",
             color: "rgba(255,255,255,0.4)", fontSize: 13, cursor: "pointer" }}>
             취소
           </button>
-          <button onClick={() => yt.trim() && onSave(yt.trim())} style={{
-            flex: 2, padding: 12, borderRadius: 10, border: "none",
-            background: yt.trim() ? "linear-gradient(135deg,#f87171,#fb923c)" : "rgba(255,255,255,0.07)",
-            color: yt.trim() ? "#fff" : "rgba(255,255,255,0.25)",
-            fontSize: 13, fontWeight: 700, cursor: yt.trim() ? "pointer" : "not-allowed" }}>
+          <button onClick={() => canSave && onSave({ gemini: gemini.trim(), yt: yt.trim() })}
+            style={{ flex: 2, padding: 12, borderRadius: 10, border: "none",
+              background: canSave ? "linear-gradient(135deg,#4285f4,#22d3ee)" : "rgba(255,255,255,0.07)",
+              color: canSave ? "#fff" : "rgba(255,255,255,0.25)",
+              fontSize: 13, fontWeight: 700, cursor: canSave ? "pointer" : "not-allowed" }}>
             저장 & 연결
           </button>
         </div>
@@ -225,40 +255,49 @@ pins는 5~8개. Pinterest에서 실제로 인기있는 구체적 키워드만.`,
   }
 }
 
-// ── Claude API 호출 헬퍼 ──────────────────────────────────────
-const ANTHROPIC_API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY || "";
+// ── Gemini API 호출 헬퍼 (Google Search Grounding 포함) ──────
+// 키는 환경변수 또는 런타임에 window.__GEMINI_KEY__로 주입
+function getGeminiKey() {
+  return window.__GEMINI_KEY__ || import.meta.env.VITE_GEMINI_API_KEY || "";
+}
+const GEMINI_MODEL = "gemini-2.0-flash";
 
 async function callClaude({ system, userMsg, useSearch = false, maxTokens = 1000 }) {
-  const body = {
-    model: "claude-sonnet-4-20250514",
-    max_tokens: maxTokens,
-    system,
-    messages: [{ role: "user", content: userMsg }],
-  };
-  if (useSearch) body.tools = [{ type: "web_search_20250305", name: "web_search" }];
+  // Gemini API endpoint
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${getGeminiKey()}`;
 
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
-      "anthropic-dangerous-direct-browser-access": "true",
+  const body = {
+    system_instruction: { parts: [{ text: system }] },
+    contents: [{ role: "user", parts: [{ text: userMsg }] }],
+    generationConfig: {
+      maxOutputTokens: maxTokens,
+      temperature: 0.3,
     },
+  };
+
+  // Google Search Grounding — 웹서치 필요할 때 자동으로 구글 검색
+  if (useSearch) {
+    body.tools = [{ google_search: {} }];
+  }
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`API ${res.status}`);
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`Gemini API ${res.status}: ${err?.error?.message || "오류"}`);
+  }
+
   const data = await res.json();
+  const text = data.candidates?.[0]?.content?.parts
+    ?.filter(p => p.text)
+    ?.map(p => p.text)
+    ?.join("") || "";
 
-  // 웹서치 결과 블록도 수집
-  const searchResults = (data.content || [])
-    .filter(b => b.type === "tool_result" || b.type === "web_search_tool_result")
-    .flatMap(b => b.content || []);
-
-  const textBlocks = (data.content || []).filter(b => b.type === "text");
-  const lastText = textBlocks[textBlocks.length - 1]?.text || "";
-
-  return { text: lastText, searchResults, rawContent: data.content || [] };
+  return { text, searchResults: [], rawContent: data };
 }
 
 // ── Step 1: 씨드 검색 + YouTube + Reddit + Pinterest 키워드 추출
@@ -768,11 +807,10 @@ function LoadingView({ stepMsg, partial, color }) {
 
 // ── 메인 앱 ──────────────────────────────────────────────────
 export default function NowWave() {
-  const [activeTab, setActiveTab] = useState("food");
+  const [activeTab, setActiveTab]   = useState("food");
   const [showSettings, setShowSettings] = useState(false);
-  const [ytKey, setYtKey] = useState(() => {
-    try { return localStorage.getItem("yt_api_key") || ""; } catch { return ""; }
-  });
+  const [ytKey, setYtKey]     = useState(() => { try { return localStorage.getItem("yt_api_key") || ""; } catch { return ""; } });
+  const [geminiKey, setGeminiKey] = useState(() => { try { return localStorage.getItem("gemini_api_key") || ""; } catch { return ""; } });
   const [state, setState] = useState({
     food:      { status: "idle", result: null, partial: null, stepMsg: "", errorMsg: "", lastUpdated: null },
     tech:      { status: "idle", result: null, partial: null, stepMsg: "", errorMsg: "", lastUpdated: null },
@@ -780,26 +818,37 @@ export default function NowWave() {
   });
   const [view, setView] = useState("combined");
 
-  const meta = CATEGORY_META[activeTab];
+  const meta    = CATEGORY_META[activeTab];
   const current = state[activeTab];
   const isLoading = current.status === "loading";
 
-  const saveYtKey = (key) => {
-    try { localStorage.setItem("yt_api_key", key); } catch {}
-    setYtKey(key);
+  const saveKeys = ({ gemini, yt }) => {
+    try {
+      localStorage.setItem("gemini_api_key", gemini);
+      if (yt) localStorage.setItem("yt_api_key", yt);
+    } catch {}
+    setGeminiKey(gemini);
+    setYtKey(yt);
     setShowSettings(false);
-    // 키 저장 후 현재 탭 리셋해서 YouTube 포함 재분석
+    // 키 저장 후 현재 탭 리셋
     setState(s => ({ ...s, [activeTab]: { ...s[activeTab], status: "idle" } }));
   };
 
-  const load = useCallback(async (cat, key = "") => {
+  // Gemini API 키를 전역 변수에 주입 (동적)
+  useEffect(() => {
+    if (geminiKey) {
+      window.__GEMINI_KEY__ = geminiKey;
+    }
+  }, [geminiKey]);
+
+  const load = useCallback(async (cat, ytk = "") => {
     setState(s => ({ ...s, [cat]: { status: "loading", result: null, partial: null, stepMsg: "준비 중...", errorMsg: "", lastUpdated: null } }));
     try {
       const result = await runTrendPipeline(
         cat,
         (msg) => setState(s => ({ ...s, [cat]: { ...s[cat], stepMsg: msg } })),
         (partial) => setState(s => ({ ...s, [cat]: { ...s[cat], partial } })),
-        key,
+        ytk,
       );
       setState(s => ({ ...s, [cat]: { status: "done", result, partial: null, stepMsg: "", errorMsg: "", lastUpdated: new Date() } }));
     } catch (err) {
@@ -808,8 +857,12 @@ export default function NowWave() {
   }, []);
 
   useEffect(() => {
-    if (state[activeTab].status === "idle") load(activeTab, ytKey);
-  }, [activeTab, ytKey]);
+    if (state[activeTab].status === "idle" && geminiKey) {
+      load(activeTab, ytKey);
+    } else if (!geminiKey) {
+      setShowSettings(true); // Gemini 키 없으면 설정창 바로 열기
+    }
+  }, [activeTab, geminiKey]);
 
   const fmt = (d) => d ? `${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")} 기준` : "";
 
@@ -831,9 +884,10 @@ export default function NowWave() {
 
       {showSettings && (
         <SettingsModal
-          onSave={saveYtKey}
+          onSave={saveKeys}
           onClose={() => setShowSettings(false)}
-          current={ytKey}
+          currentYt={ytKey}
+          currentGemini={geminiKey}
         />
       )}
 
@@ -879,7 +933,21 @@ export default function NowWave() {
               </div>
               {/* 소스 뱃지 + 설정 */}
               <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                {/* Reddit 뱃지 — 항상 연결됨 */}
+                {/* Gemini 뱃지 */}
+                <div style={{
+                  padding: "4px 10px", borderRadius: 20, fontSize: 11,
+                  border: `1px solid ${geminiKey ? "rgba(66,133,244,0.4)" : "rgba(255,80,80,0.4)"}`,
+                  background: geminiKey ? "rgba(66,133,244,0.1)" : "rgba(255,80,80,0.08)",
+                  color: geminiKey ? "#4285f4" : "#f87171",
+                  display: "flex", alignItems: "center", gap: 5,
+                }}>
+                  <span style={{ width: 5, height: 5, borderRadius: "50%",
+                    background: geminiKey ? "#4285f4" : "#f87171",
+                    boxShadow: geminiKey ? "0 0 6px #4285f4" : "none",
+                    display: "inline-block",
+                    animation: geminiKey ? "pulse 2s infinite" : "none" }} />
+                  {geminiKey ? "Gemini 연결됨" : "Gemini 키 필요"}
+                </div>
                 <div style={{
                   padding: "4px 10px", borderRadius: 20, fontSize: 11,
                   border: "1px solid rgba(255,107,52,0.4)",
